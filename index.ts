@@ -35,6 +35,7 @@ window.initMap = initMap;
 class MapFactory {
   private options;
   private map;
+  protected currentCountry;
   protected allMarkers = [];
 
   constructor(options = {}) {
@@ -47,6 +48,8 @@ class MapFactory {
 
   public centerByCountryName(countryName) {
     const geocoder = new google.maps.Geocoder();
+    this.currentCountry = countryName;
+    console.log(this.currentCountry);
 
     geocoder.geocode({ address: countryName }, (results, status) => {
       if (status == google.maps.GeocoderStatus.OK && results?.[0]) {
@@ -125,12 +128,24 @@ class SalesMap extends MapFactory {
     this.createMarkers(foo);
     console.log(foo);
   }
+
+  public changeCountry(country) {
+    console.log(super.currentCountry);
+    if (super.currentCountry !== country) {
+      /**
+       * 1. limpiar markers
+       * 2. centrar el país
+       * 3. filtrar markers
+       * 4. crear markers
+       */
+    }
+  }
 }
 
 function initMap(): void {
   const mapContainer = document.getElementById('map');
   const salesMap = new SalesMap();
-
+  
   salesMap.create(mapContainer);
   salesMap.centerByCountryName('Germany');
   const filteredData = salesMap.filterMarkersByCountry('de', data);
@@ -138,8 +153,19 @@ function initMap(): void {
   // const filteredData = salesMap.filterMarkersByType('partner', data);
   // salesMap.createMarkers(filteredData);
 
+  const mapContainer2 = document.getElementById('map2');
+  const salesMap2 = new SalesMap();
+
+  salesMap2.create(mapContainer2);
+  salesMap2.centerByCountryName('Peru');
+  
+
   document.querySelector('#clearButton')?.addEventListener('click', () => {
     salesMap.updateMarkers();
+  });
+
+  document.querySelector('#changeCountry')?.addEventListener('click', () => {
+    salesMap2.changeCountry('Brazil');
   });
 }
 
