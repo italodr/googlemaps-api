@@ -36,22 +36,6 @@ class MapFactory {
   private options;
   private map;
 
-  private markersType = {
-    default: '#e2001a',
-    shopping: '#767576',
-    partner: '#025a5a',
-  };
-
-  private markerIcon = {
-    path: 'M 12 2.016 q 2.906 0 4.945 2.039 t 2.039 4.945 q 0 1.453 -0.727 3.328 t -1.758 3.516 t -2.039 3.07 t -1.711 2.273 l -0.75 0.797 q -0.281 -0.328 -0.75 -0.867 t -1.688 -2.156 t -2.133 -3.141 t -1.664 -3.445 t -0.75 -3.375 q 0 -2.906 2.039 -4.945 t 4.945 -2.039',
-    fillOpacity: 1,
-    strokeWeight: 2,
-    strokeColor: '#fff',
-    rotation: 0,
-    scale: 1.5,
-    anchor: new google.maps.Point(12, 30),
-  };
-
   constructor(options = {}) {
     this.options = options;
   }
@@ -72,23 +56,52 @@ class MapFactory {
     });
   }
 
+  public createMarker(lat, lng, options = {}) {
+    new google.maps.Marker({
+      map: this.map,
+      position: { lat, lng },
+      ...options,
+    });
+  }
+}
+
+class SalesMap extends MapFactory {
+  private markersType = {
+    default: '#e2001a',
+    shopping: '#767576',
+    partner: '#025a5a',
+  };
+
+  private markerIcon = {
+    path: 'M 12 2.016 q 2.906 0 4.945 2.039 t 2.039 4.945 q 0 1.453 -0.727 3.328 t -1.758 3.516 t -2.039 3.07 t -1.711 2.273 l -0.75 0.797 q -0.281 -0.328 -0.75 -0.867 t -1.688 -2.156 t -2.133 -3.141 t -1.664 -3.445 t -0.75 -3.375 q 0 -2.906 2.039 -4.945 t 4.945 -2.039',
+    fillOpacity: 1,
+    strokeWeight: 2,
+    strokeColor: '#fff',
+    rotation: 0,
+    scale: 1.5,
+    anchor: new google.maps.Point(12, 30),
+  };
+
+  constructor() {
+    super();
+  }
+
   public createMarkers(markers = []) {
     const _self = this;
-    markers.map((marker) => {
-      new google.maps.Marker({
-        position: { lat: marker.lat, lng: marker.lng },
-        map: _self.map,
-        title: marker.title,
+    markers.map(({ lat, lng, title, type }) => {
+      const fillColor = _self.markersType?.[type] || _self.markersType.default;
+
+      super.createMarker(lat, lng, {
+        title,
         icon: {
           ..._self.markerIcon,
-          fillColor:
-            _self.markersType?.[marker.type] || _self.markersType.default,
+          fillColor,
         },
       });
     });
   }
 
-  public createFilteredMarkersByType(type, markers = []) {
+  public filterMarkersByType(type, markers = []) {
     if (!type) return this.createMarkers(markers);
 
     const filteredMarkers = markers.filter((m) => m.type === type);
@@ -98,12 +111,12 @@ class MapFactory {
 
 document.addEventListener('DOMContentLoaded', (event) => {
   const mapContainer = document.getElementById('map');
-  const SalesMap = new MapFactory();
+  const salesMap = new SalesMap();
 
-  SalesMap.create(mapContainer);
-  SalesMap.centerByCountryName('Germany');
-  SalesMap.createMarkers(data);
-  //SalesMap.createFilteredMarkersByType('partner', data);
+  salesMap.create(mapContainer);
+  salesMap.centerByCountryName('Germany');
+  salesMap.createMarkers(data);
+  //salesMap.filterMarkersByType('partner', data);
 });
 
 export {};
