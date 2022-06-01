@@ -102,8 +102,8 @@ document.addEventListener('DOMContentLoaded', (event) => {
 
   SalesMap.create(mapContainer);
   SalesMap.centerByCountryName('Germany');
-  //SalesMap.createMarkers(data);
-  SalesMap.createFilteredMarkersByType('partner', data);
+  SalesMap.createMarkers(data);
+  //SalesMap.createFilteredMarkersByType('partner', data);
 });
 
 export {};

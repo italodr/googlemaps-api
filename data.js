@@ -4,6 +4,7 @@ export default [
     lat: 53.077828,
     lng: 8.818983,
     zipcode: '28203',
+    type: 'default',
   },
   {
     title: 'Netzstrategen',
@@ -11,5 +12,12 @@ export default [
     lng: 8.4264649,
     zipcode: '76131',
     type: 'partner',
+  },
+  {
+    title: 'Netzstrategen',
+    lat: 50.949725,
+    lng: 6.9085446,
+    zipcode: '50825',
+    type: 'shopping',
   },
 ];
