@@ -1,23 +1,38 @@
 export default [
   {
+    id: 1,
     title: 'Galerie Roche',
     lat: 53.077828,
     lng: 8.818983,
+    country: 'de',
     zipcode: '28203',
     type: 'default',
   },
   {
+    id: 2,
     title: 'Netzstrategen',
     lat: 49.0054186,
     lng: 8.4264649,
+    country: 'de',
     zipcode: '76131',
     type: 'partner',
   },
   {
+    id: 3,
     title: 'Netzstrategen',
     lat: 50.949725,
     lng: 6.9085446,
+    country: 'de',
     zipcode: '50825',
     type: 'shopping',
+  },
+  {
+    id: 4,
+    title: 'Parlamento Europeo',
+    lat: 48.6073442,
+    lng: 7.7306228,
+    country: 'fr',
+    zipcode: '67070',
+    type: 'partner',
   },
 ];

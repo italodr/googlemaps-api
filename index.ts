@@ -35,6 +35,7 @@ window.initMap = initMap;
 class MapFactory {
   private options;
   private map;
+  protected allMarkers = [];
 
   constructor(options = {}) {
     this.options = options;
@@ -45,23 +46,28 @@ class MapFactory {
   }
 
   public centerByCountryName(countryName) {
-    const _self = this;
     const geocoder = new google.maps.Geocoder();
 
-    geocoder.geocode({ address: countryName }, function (results, status) {
+    geocoder.geocode({ address: countryName }, (results, status) => {
       if (status == google.maps.GeocoderStatus.OK && results?.[0]) {
-        _self.map.setCenter(results[0].geometry.location);
-        _self.map.fitBounds(results[0].geometry.viewport);
+        this.map.setCenter(results[0].geometry.location);
+        this.map.fitBounds(results[0].geometry.viewport);
       }
     });
   }
 
   public createMarker(lat, lng, options = {}) {
-    new google.maps.Marker({
+    const newMarker = new google.maps.Marker({
       map: this.map,
       position: { lat, lng },
       ...options,
     });
+
+    this.allMarkers.push(newMarker);
+  }
+
+  protected clearMarkers() {
+    this.allMarkers.map((marker) => marker.setMap(null));
   }
 }
 
@@ -87,14 +93,13 @@ class SalesMap extends MapFactory {
   }
 
   public createMarkers(markers = []) {
-    const _self = this;
     markers.map(({ lat, lng, title, type }) => {
-      const fillColor = _self.markersType?.[type] || _self.markersType.default;
+      const fillColor = this.markersType?.[type] || this.markersType.default;
 
       super.createMarker(lat, lng, {
         title,
         icon: {
-          ..._self.markerIcon,
+          ...this.markerIcon,
           fillColor,
         },
       });
@@ -102,21 +107,47 @@ class SalesMap extends MapFactory {
   }
 
   public filterMarkersByType(type, markers = []) {
-    if (!type) return this.createMarkers(markers);
+    if (!type) return markers;
 
-    const filteredMarkers = markers.filter((m) => m.type === type);
-    return this.createMarkers(filteredMarkers);
+    return markers.filter((m) => m.type === type);
+  }
+
+  public filterMarkersByCountry(country, markers = []) {
+    if (!country) return markers;
+
+    return markers.filter((m) => m.country === country);
+  }
+
+  public updateMarkers() {
+    super.clearMarkers();
+    // Centrar según markers
+    const foo = this.filterMarkersByType('partner', data);
+    this.createMarkers(foo);
+    console.log(foo);
   }
 }
 
-document.addEventListener('DOMContentLoaded', (event) => {
+function initMap(): void {
   const mapContainer = document.getElementById('map');
   const salesMap = new SalesMap();
 
   salesMap.create(mapContainer);
   salesMap.centerByCountryName('Germany');
-  salesMap.createMarkers(data);
-  //salesMap.filterMarkersByType('partner', data);
-});
+  const filteredData = salesMap.filterMarkersByCountry('de', data);
+  salesMap.createMarkers(filteredData);
+  // const filteredData = salesMap.filterMarkersByType('partner', data);
+  // salesMap.createMarkers(filteredData);
+
+  document.querySelector('#clearButton')?.addEventListener('click', () => {
+    salesMap.updateMarkers();
+  });
+}
+
+declare global {
+  interface Window {
+    initMap: () => void;
+  }
+}
+window.initMap = initMap;
 
 export {};
