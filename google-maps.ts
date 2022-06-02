@@ -32,25 +32,25 @@ export default class MapFactory {
   }
 
   public createMarker(lat, lng, options = {}) {
-    const newMarker = new google.maps.Marker({
+    const marker = new google.maps.Marker({
       map: this.map,
       position: { lat, lng },
       ...options,
     });
 
-    this.allMarkers.push(newMarker);
-    this.bounds.extend(newMarker.position);
+    this.allMarkers.push(marker);
+    this.bounds.extend(marker.position);
 
-    google.maps.event.addListener(
-      newMarker,
-      'click',
-      ((marker) => {
-        return () => {
-          this.infoWindow.setContent(newMarker.info);
-          this.infoWindow.open(this.map, marker);
-        };
-      })(newMarker)
-    );
+    return marker;
+  }
+
+  protected addListenerToMarker(marker, callback) {
+    google.maps.event.addListener(marker, 'click', callback);
+  }
+
+  protected setInfoWindow(marker, info) {
+    this.infoWindow.setContent(info);
+    this.infoWindow.open(this.map, marker);
   }
 
   protected clearMarkers() {

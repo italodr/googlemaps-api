@@ -18,8 +18,15 @@ body {
   padding: 0;
 }
 
+.map {
+  background: lightgray;
+  display: grid;
+  gap: 2rem;
+}
+
 #map {
-  height: 94vh;
+  min-height: 80vh;
+  height: 100%;
 }
 
 .types {
@@ -40,4 +47,10 @@ body {
 
 .types li svg {
   width: 30px;
+}
+
+@media (min-width: 1024px) {
+  .map {
+    grid-template-columns: 300px 1fr;
+  }
 }

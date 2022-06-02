@@ -47,13 +47,25 @@ export default class SalesMap extends MapFactory {
         <p class="info-window__description">${description || ''}</p>
       </div>`;
 
-      super.createMarker(lat, lng, {
+      let callback;
+
+      const marker = super.createMarker(lat, lng, {
         info,
         icon: {
           ...this.markerIcon,
           fillColor,
         },
       });
+
+      if (window.matchMedia('(max-width: 1023px)').matches) {
+        callback = () => {
+          document.getElementById('mobile-content').innerHTML = marker.info;
+        };
+      } else {
+        callback = () => super.setInfoWindow(marker, info);
+      }
+
+      super.addListenerToMarker(marker, callback);
     });
   }
 
