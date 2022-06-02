@@ -37,6 +37,7 @@ class MapFactory {
   private map;
   protected currentCountry;
   protected allMarkers = [];
+  private bounds = new google.maps.LatLngBounds();
 
   constructor(options = {}) {
     this.options = options;
@@ -58,6 +59,10 @@ class MapFactory {
     });
   }
 
+  protected centerByBounds() {
+    this.map.fitBounds(this.bounds);
+  }
+
   public createMarker(lat, lng, options = {}) {
     const newMarker = new google.maps.Marker({
       map: this.map,
@@ -66,6 +71,7 @@ class MapFactory {
     });
 
     this.allMarkers.push(newMarker);
+    this.bounds.extend(newMarker.position);
   }
 
   protected clearMarkers() {
@@ -204,8 +210,10 @@ class SalesMap extends MapFactory {
 
   public updateMarkers(markers = []) {
     super.clearMarkers();
-    // Centrar según markers
+
     this.createMarkers(markers);
+
+    super.centerByBounds();
   }
 
   public changeCountry(country) {
@@ -241,7 +249,7 @@ function initMap(): void {
   autocompleteInput.addListener('place_changed', async () => {
     const { name } = autocompleteInput.getPlace();
     const filteredData = salesMap.filterMarkersByZipcode(name, data);
-    console.log(filteredData);
+
     salesMap.updateMarkers(filteredData);
   });
 
