@@ -33,9 +33,9 @@ import data from './data';
  */
 
 class MapFactory {
+  protected currentCountry;
   private options;
   private map;
-  protected currentCountry;
   protected allMarkers = [];
   private bounds = new google.maps.LatLngBounds();
 
@@ -47,11 +47,11 @@ class MapFactory {
     this.map = new google.maps.Map(element, this.options);
   }
 
-  public centerByCountryName(countryName) {
+  public centerByCountry(country) {
+    this.currentCountry = country;
     const geocoder = new google.maps.Geocoder();
-    this.currentCountry = countryName;
 
-    geocoder.geocode({ address: countryName }, (results, status) => {
+    geocoder.geocode({ address: country }, (results, status) => {
       if (status == google.maps.GeocoderStatus.OK && results?.[0]) {
         this.map.setCenter(results[0].geometry.location);
         this.map.fitBounds(results[0].geometry.viewport);
@@ -101,6 +101,12 @@ class SalesMap extends MapFactory {
     rotation: 0,
     scale: 1.5,
     anchor: new google.maps.Point(12, 30),
+  };
+
+  private countries = {
+    de: 'Germany',
+    fr: 'France',
+    es: 'Spain',
   };
 
   private standorts = [
@@ -182,7 +188,7 @@ class SalesMap extends MapFactory {
   public filterMarkersByType(type, markers = []) {
     if (!type) return markers;
 
-    return markers.filter((m) => m.type === type);
+    return markers.filter((m) => !m.type || m.type === type);
   }
 
   public filterMarkersByCountry(country, markers = []) {
@@ -195,6 +201,7 @@ class SalesMap extends MapFactory {
     if (!zipcode) return markers;
 
     const standort = this.getStandortByZipcode(zipcode);
+
     return markers.reduce((prev, curr) => {
       const searchZipcode = parseInt(curr.zipcode, 10);
 
@@ -216,15 +223,13 @@ class SalesMap extends MapFactory {
     super.centerByBounds();
   }
 
-  public changeCountry(country) {
-    console.log(super.currentCountry);
-    if (super.currentCountry !== country) {
-      /**
-       * 1. limpiar markers
-       * 2. centrar el país
-       * 3. filtrar markers
-       * 4. crear markers
-       */
+  public setCountry(country) {
+    if (this.currentCountry !== this.countries[country]) {
+      super.clearMarkers();
+      this.centerByCountry(this.countries[country]);
+
+      const filteredData = this.filterMarkersByCountry(country, data);
+      this.createMarkers(filteredData);
     }
   }
 }
@@ -235,11 +240,17 @@ function initMap(): void {
   const salesMap = new SalesMap();
 
   salesMap.create(mapContainer);
-  salesMap.centerByCountryName('Germany');
-  const filteredData = salesMap.filterMarkersByCountry('de', data);
-  salesMap.createMarkers(filteredData);
-  // const filteredData = salesMap.filterMarkersByType('partner', data);
-  // salesMap.createMarkers(filteredData);
+  salesMap.setCountry('de');
+
+  /**
+    * Multiple maps
+    * 
+   const mapContainer2 = document.getElementById('map2');
+   const salesMap2 = new SalesMap();
+ 
+   salesMap2.create(mapContainer2);
+   salesMap2.setCountry('sp');
+   */
 
   const autocompleteInput = salesMap.setAutocompleteInput(searchInput, {
     componentRestrictions: { country: ['DE'] },
@@ -253,23 +264,26 @@ function initMap(): void {
     salesMap.updateMarkers(filteredData);
   });
 
-  /**
-    * Multiple maps
-    * 
-   const mapContainer2 = document.getElementById('map2');
-   const salesMap2 = new SalesMap();
- 
-   salesMap2.create(mapContainer2);
-   salesMap2.centerByCountryName('Peru');
-   */
+  const types = Array.from(document.querySelectorAll('.types li'));
+
+  types.map((element) => {
+    element.addEventListener('click', (event) => {
+      const { type } = event.currentTarget.dataset;
+      const filteredData = salesMap.filterMarkersByType(type, data);
+
+      salesMap.updateMarkers(filteredData);
+    });
+  });
 
   document.querySelector('#clearButton')?.addEventListener('click', () => {
     salesMap.updateMarkers();
   });
 
-  document.querySelector('#changeCountry')?.addEventListener('click', () => {
-    salesMap.changeCountry('Brazil');
-  });
+  document
+    .querySelector('#changeCountry')
+    ?.addEventListener('change', (event) => {
+      salesMap.setCountry(event.currentTarget.value);
+    });
 }
 
 declare global {

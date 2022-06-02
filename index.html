@@ -20,8 +20,56 @@
 
     <section class="actions">
       <button id="clearButton">Clear</button>
-      <button id="changeCountry">Change country</button>
+      <select id="changeCountry">
+        <option value="de" selected>Germany</option>
+        <option value="fr">France</option>
+        <option value="es">Spain</option>
+      </select>
       <input type="text" name="autocomplete" />
+      <ul class="types">
+        <li data-type="default">
+          <svg
+            style="enable-background: new 0 0 30 30"
+            viewBox="0 0 30 30"
+            xml:space="preserve"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              fill="#e2001a"
+              d="M 12 2.016 q 2.906 0 4.945 2.039 t 2.039 4.945 q 0 1.453 -0.727 3.328 t -1.758 3.516 t -2.039 3.07 t -1.711 2.273 l -0.75 0.797 q -0.281 -0.328 -0.75 -0.867 t -1.688 -2.156 t -2.133 -3.141 t -1.664 -3.445 t -0.75 -3.375 q 0 -2.906 2.039 -4.945 t 4.945 -2.039"
+            />
+          </svg>
+          Default
+        </li>
+        <li data-type="partner">
+          <svg
+            style="enable-background: new 0 0 30 30"
+            viewBox="0 0 30 30"
+            xml:space="preserve"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              fill="#025a5a"
+              d="M 12 2.016 q 2.906 0 4.945 2.039 t 2.039 4.945 q 0 1.453 -0.727 3.328 t -1.758 3.516 t -2.039 3.07 t -1.711 2.273 l -0.75 0.797 q -0.281 -0.328 -0.75 -0.867 t -1.688 -2.156 t -2.133 -3.141 t -1.664 -3.445 t -0.75 -3.375 q 0 -2.906 2.039 -4.945 t 4.945 -2.039"
+            />
+          </svg>
+          Partner
+        </li>
+        <li data-type="shopping">
+          <svg
+            style="enable-background: new 0 0 30 30"
+            viewBox="0 0 30 30"
+            xml:space="preserve"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              fill="#767576"
+              d="M 12 2.016 q 2.906 0 4.945 2.039 t 2.039 4.945 q 0 1.453 -0.727 3.328 t -1.758 3.516 t -2.039 3.07 t -1.711 2.273 l -0.75 0.797 q -0.281 -0.328 -0.75 -0.867 t -1.688 -2.156 t -2.133 -3.141 t -1.664 -3.445 t -0.75 -3.375 q 0 -2.906 2.039 -4.945 t 4.945 -2.039"
+            />
+          </svg>
+          Shopping
+        </li>
+      </ul>
     </section>
     <!-- 
      The `defer` attribute causes the callback to execute after the full HTML

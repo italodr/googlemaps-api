@@ -21,3 +21,23 @@ body {
 #map {
   height: 94vh;
 }
+
+.types {
+  align-items: center;
+  display: inline-flex;
+  gap: 1rem;
+}
+
+.types li {
+  align-items: center;
+  cursor: pointer;
+  display: inline-flex;
+  justify-content: flex-start;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.types li svg {
+  width: 30px;
+}
