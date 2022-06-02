@@ -49,7 +49,6 @@ class MapFactory {
   public centerByCountryName(countryName) {
     const geocoder = new google.maps.Geocoder();
     this.currentCountry = countryName;
-    console.log(this.currentCountry);
 
     geocoder.geocode({ address: countryName }, (results, status) => {
       if (status == google.maps.GeocoderStatus.OK && results?.[0]) {
@@ -72,6 +71,13 @@ class MapFactory {
   protected clearMarkers() {
     this.allMarkers.map((marker) => marker.setMap(null));
   }
+
+  public setAutocompleteInput(element, options = {}) {
+    return new google.maps.places.Autocomplete(element, {
+      fields: ['address_components', 'geometry', 'name'],
+      ...options,
+    });
+  } 
 }
 
 class SalesMap extends MapFactory {
@@ -121,12 +127,17 @@ class SalesMap extends MapFactory {
     return markers.filter((m) => m.country === country);
   }
 
+  public filterMarkersByZipcode(zipcode, markers = []) {
+    if (!zipcode) return markers;
+
+    return markers.filter((m) => m.zipcode === zipcode);
+  }
+
   public updateMarkers() {
     super.clearMarkers();
     // Centrar según markers
     const foo = this.filterMarkersByType('partner', data);
     this.createMarkers(foo);
-    console.log(foo);
   }
 
   public changeCountry(country) {
@@ -144,6 +155,7 @@ class SalesMap extends MapFactory {
 
 function initMap(): void {
   const mapContainer = document.getElementById('map');
+  const searchInput = document.querySelector('[name="autocomplete"]');
   const salesMap = new SalesMap();
   
   salesMap.create(mapContainer);
@@ -153,19 +165,33 @@ function initMap(): void {
   // const filteredData = salesMap.filterMarkersByType('partner', data);
   // salesMap.createMarkers(filteredData);
 
+  const autocompleteInput = salesMap.setAutocompleteInput(searchInput, {
+    componentRestrictions: { country: ['DE'] },
+    types: ['(regions)'],
+  });
+
+  autocompleteInput.addListener('place_changed', async () => {
+    const place = autocompleteInput.getPlace();
+    console.log(place);
+  });
+
+
+  /**
+   * Multiple maps
+   * 
   const mapContainer2 = document.getElementById('map2');
   const salesMap2 = new SalesMap();
 
   salesMap2.create(mapContainer2);
   salesMap2.centerByCountryName('Peru');
-  
+  */
 
   document.querySelector('#clearButton')?.addEventListener('click', () => {
     salesMap.updateMarkers();
   });
 
   document.querySelector('#changeCountry')?.addEventListener('click', () => {
-    salesMap2.changeCountry('Brazil');
+    salesMap.changeCountry('Brazil');
   });
 }
 

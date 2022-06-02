@@ -18,12 +18,6 @@ body {
   padding: 0;
 }
 
-.maps {
-  display: flex;
-  height: 90vh;
+#map {
+  height: 94vh;
 }
-
-div {
-  width: 100%;
-}
-
