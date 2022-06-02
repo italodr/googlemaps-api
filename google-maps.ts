@@ -2,17 +2,12 @@ export default class MapFactory {
   protected currentCountry;
   protected allMarkers = [];
 
-  private options;
   private map;
   private bounds = new google.maps.LatLngBounds();
   private infoWindow = new google.maps.InfoWindow();
 
-  constructor(options = {}) {
-    this.options = options;
-  }
-
-  public create(element) {
-    this.map = new google.maps.Map(element, this.options);
+  public create(element, options = {}) {
+    this.map = new google.maps.Map(element, options);
   }
 
   public centerByCountry(country) {
@@ -35,7 +30,7 @@ export default class MapFactory {
     const marker = new google.maps.Marker({
       map: this.map,
       position: { lat, lng },
-      ...options,
+      ...options
     });
 
     this.allMarkers.push(marker);
@@ -54,13 +49,13 @@ export default class MapFactory {
   }
 
   protected clearMarkers() {
-    this.allMarkers.map((marker) => marker.setMap(null));
+    this.allMarkers.map(marker => marker.setMap(null));
   }
 
   public setAutocompleteInput(element, options = {}) {
     return new google.maps.places.Autocomplete(element, {
       fields: ['address_components', 'geometry', 'name'],
-      ...options,
+      ...options
     });
   }
 }
