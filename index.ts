@@ -3,7 +3,7 @@
  * Copyright 2019 Google LLC. All Rights Reserved.
  * SPDX-License-Identifier: Apache-2.0
  */
-import data from './data';
+import { locations, countries, standorts } from './data';
 
 /*
  function initMap(): void {
@@ -116,55 +116,6 @@ class SalesMap extends MapFactory {
     anchor: new google.maps.Point(12, 30),
   };
 
-  private countries = {
-    de: 'Germany',
-    fr: 'France',
-    es: 'Spain',
-  };
-
-  private standorts = [
-    {
-      id: 4,
-      title: 'DE - Verkaufsbüro Stuttgart (04)',
-      plzBereiche: [
-        [70000, 71999],
-        [72600, 72699],
-        [73000, 74699],
-        [75000, 75038],
-        [75305, 75999],
-        [75046, 75050],
-        [75054, 75196],
-        [75201, 75249],
-      ],
-    },
-    {
-      id: 5,
-      title: 'DE - Verkaufsbüro Saar / Pfalz / Rhein-Neckar (05)',
-      plzBereiche: [
-        [69460, 69469],
-        [68650, 69239],
-        [69484, 69493],
-        [54000, 54999],
-        [55600, 55999],
-        [56800, 56999],
-        [66000, 66999],
-        [67000, 67199],
-        [67320, 67499],
-        [67600, 67799],
-        [67830, 67999],
-        [68000, 68599],
-        [69503, 69509],
-        [69515, 69999],
-        [69243, 69411],
-        [76708, 76764],
-        [76650, 76669],
-        [76705, 76706],
-        [76769, 76774],
-        [76780, 76999],
-      ],
-    },
-  ];
-
   constructor() {
     super();
   }
@@ -173,7 +124,7 @@ class SalesMap extends MapFactory {
     const searchZipcode = parseInt(zipcode, 10);
     let result;
 
-    this.standorts.map((standort) => {
+    standorts.map((standort) => {
       standort.plzBereiche.map((plzBereich) => {
         if (searchZipcode >= plzBereich[0] && searchZipcode <= plzBereich[1]) {
           result = standort;
@@ -243,11 +194,11 @@ class SalesMap extends MapFactory {
   }
 
   public setCountry(country) {
-    if (this.currentCountry !== this.countries[country]) {
+    if (this.currentCountry !== countries[country]) {
       super.clearMarkers();
-      this.centerByCountry(this.countries[country]);
+      this.centerByCountry(countries[country]);
 
-      const filteredData = this.filterMarkersByCountry(country, data);
+      const filteredData = this.filterMarkersByCountry(country, locations);
       this.createMarkers(filteredData);
     }
   }
@@ -278,7 +229,7 @@ function initMap(): void {
 
   autocompleteInput.addListener('place_changed', async () => {
     const { name } = autocompleteInput.getPlace();
-    const filteredData = salesMap.filterMarkersByZipcode(name, data);
+    const filteredData = salesMap.filterMarkersByZipcode(name, locations);
 
     salesMap.updateMarkers(filteredData);
   });
@@ -288,7 +239,7 @@ function initMap(): void {
   types.map((element) => {
     element.addEventListener('click', (event) => {
       const { type } = event.currentTarget.dataset;
-      const filteredData = salesMap.filterMarkersByType(type, data);
+      const filteredData = salesMap.filterMarkersByType(type, locations);
 
       salesMap.updateMarkers(filteredData);
     });

@@ -1,4 +1,4 @@
-export default [
+export const locations = [
   {
     id: 1,
     title: 'Galerie Roche',
@@ -70,5 +70,54 @@ export default [
     zipcode: '55606',
     type: 'partner',
     standortId: 5,
+  },
+];
+
+export const countries = {
+  de: 'Germany',
+  fr: 'France',
+  es: 'Spain',
+};
+
+export const standorts = [
+  {
+    id: 4,
+    title: 'DE - Verkaufsbüro Stuttgart (04)',
+    plzBereiche: [
+      [70000, 71999],
+      [72600, 72699],
+      [73000, 74699],
+      [75000, 75038],
+      [75305, 75999],
+      [75046, 75050],
+      [75054, 75196],
+      [75201, 75249],
+    ],
+  },
+  {
+    id: 5,
+    title: 'DE - Verkaufsbüro Saar / Pfalz / Rhein-Neckar (05)',
+    plzBereiche: [
+      [69460, 69469],
+      [68650, 69239],
+      [69484, 69493],
+      [54000, 54999],
+      [55600, 55999],
+      [56800, 56999],
+      [66000, 66999],
+      [67000, 67199],
+      [67320, 67499],
+      [67600, 67799],
+      [67830, 67999],
+      [68000, 68599],
+      [69503, 69509],
+      [69515, 69999],
+      [69243, 69411],
+      [76708, 76764],
+      [76650, 76669],
+      [76705, 76706],
+      [76769, 76774],
+      [76780, 76999],
+    ],
   },
 ];
