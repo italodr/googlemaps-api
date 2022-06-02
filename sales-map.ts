@@ -5,7 +5,7 @@ export default class SalesMap extends MapFactory {
   private markersType = {
     default: '#e2001a',
     shopping: '#767576',
-    partner: '#025a5a',
+    partner: '#025a5a'
   };
 
   private markerIcon = {
@@ -15,7 +15,7 @@ export default class SalesMap extends MapFactory {
     strokeColor: '#fff',
     rotation: 0,
     scale: 1.5,
-    anchor: new google.maps.Point(12, 30),
+    anchor: new google.maps.Point(12, 30)
   };
 
   constructor() {
@@ -26,8 +26,8 @@ export default class SalesMap extends MapFactory {
     const searchZipcode = parseInt(zipcode, 10);
     let result;
 
-    standorts.map((standort) => {
-      standort.plzBereiche.map((plzBereich) => {
+    standorts.map(standort => {
+      standort.plzBereiche.map(plzBereich => {
         if (searchZipcode >= plzBereich[0] && searchZipcode <= plzBereich[1]) {
           result = standort;
         }
@@ -37,42 +37,45 @@ export default class SalesMap extends MapFactory {
     return result;
   }
 
-  public createMarkers(markers = []) {
-    markers.map(({ lat, lng, title, description, type }) => {
-      const fillColor = this.markersType?.[type] || this.markersType.default;
-
-      const info = `
+  private getInfoWindowContent({ title, description }) {
+    return `
       <div class="info-window">
         <div class="info-window__title">${title}</div>
         <p class="info-window__description">${description || ''}</p>
       </div>`;
+  }
 
-      let callback;
+  public addListenerToMarker(marker) {
+    if (window.matchMedia('(max-width: 1023px)').matches) {
+      super.addListenerToMarker(marker, () => {
+        document.getElementById('mobile-content').innerHTML = marker.info;
+      });
+    } else {
+      super.addListenerToMarker(marker, () => super.setInfoWindow(marker));
+    }
+  }
+
+  public createMarkers(markers = []) {
+    markers.map(({ lat, lng, type, ...props }) => {
+      const fillColor = this.markersType?.[type] || this.markersType.default;
+      const info = this.getInfoWindowContent(props);
 
       const marker = super.createMarker(lat, lng, {
         info,
         icon: {
           ...this.markerIcon,
-          fillColor,
-        },
+          fillColor
+        }
       });
 
-      if (window.matchMedia('(max-width: 1023px)').matches) {
-        callback = () => {
-          document.getElementById('mobile-content').innerHTML = marker.info;
-        };
-      } else {
-        callback = () => super.setInfoWindow(marker, info);
-      }
-
-      super.addListenerToMarker(marker, callback);
+      this.addListenerToMarker(marker);
     });
   }
 
   public filterMarkersByType(type, markers = []) {
     if (!type) return markers;
 
-    return markers.filter((m) => {
+    return markers.filter(m => {
       const typeFilter = (type === 'default' && !m.type) || m.type === type;
 
       if (this.currentCountry) {
@@ -87,7 +90,7 @@ export default class SalesMap extends MapFactory {
   public filterMarkersByCountry(country, markers = []) {
     if (!country) return markers;
 
-    return markers.filter((m) => m.country === country);
+    return markers.filter(m => m.country === country);
   }
 
   public filterMarkersByZipcode(zipcode, markers = []) {
@@ -98,7 +101,7 @@ export default class SalesMap extends MapFactory {
     return markers.reduce((prev, curr) => {
       const searchZipcode = parseInt(curr.zipcode, 10);
 
-      standort.plzBereiche.map((plzBereich) => {
+      standort.plzBereiche.map(plzBereich => {
         if (searchZipcode >= plzBereich[0] && searchZipcode <= plzBereich[1]) {
           prev.push(curr);
         }
@@ -110,9 +113,7 @@ export default class SalesMap extends MapFactory {
 
   public updateMarkers(markers = []) {
     super.clearMarkers();
-
     this.createMarkers(markers);
-
     super.centerByBounds();
   }
 

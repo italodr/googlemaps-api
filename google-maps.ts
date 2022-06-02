@@ -48,8 +48,8 @@ export default class MapFactory {
     google.maps.event.addListener(marker, 'click', callback);
   }
 
-  protected setInfoWindow(marker, info) {
-    this.infoWindow.setContent(info);
+  protected setInfoWindow(marker) {
+    this.infoWindow.setContent(marker.info);
     this.infoWindow.open(this.map, marker);
   }
 
