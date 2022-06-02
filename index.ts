@@ -65,7 +65,16 @@ class SalesMap extends MapFactory {
   public filterMarkersByType(type, markers = []) {
     if (!type) return markers;
 
-    return markers.filter((m) => !m.type || m.type === type);
+    return markers.filter((m) => {
+      const typeFilter = (type === 'default' && !m.type) || m.type === type;
+
+      if (this.currentCountry) {
+        console.log(this.currentCountry);
+        return typeFilter && countries[m.country] === this.currentCountry;
+      }
+
+      return typeFilter;
+    });
   }
 
   public filterMarkersByCountry(country, markers = []) {
