@@ -34,10 +34,12 @@ import data from './data';
 
 class MapFactory {
   protected currentCountry;
+  protected allMarkers = [];
+
   private options;
   private map;
-  protected allMarkers = [];
   private bounds = new google.maps.LatLngBounds();
+  private infoWindow = new google.maps.InfoWindow();
 
   constructor(options = {}) {
     this.options = options;
@@ -72,6 +74,17 @@ class MapFactory {
 
     this.allMarkers.push(newMarker);
     this.bounds.extend(newMarker.position);
+
+    google.maps.event.addListener(
+      newMarker,
+      'click',
+      ((marker) => {
+        return () => {
+          this.infoWindow.setContent(newMarker.info);
+          this.infoWindow.open(this.map, marker);
+        };
+      })(newMarker)
+    );
   }
 
   protected clearMarkers() {
@@ -172,11 +185,17 @@ class SalesMap extends MapFactory {
   }
 
   public createMarkers(markers = []) {
-    markers.map(({ lat, lng, title, type }) => {
+    markers.map(({ lat, lng, title, description, type }) => {
       const fillColor = this.markersType?.[type] || this.markersType.default;
 
+      const info = `
+      <div class="info-window">
+        <div class="info-window__title">${title}</div>
+        <p class="info-window__description">${description || ''}</p>
+      </div>`;
+
       super.createMarker(lat, lng, {
-        title,
+        info,
         icon: {
           ...this.markerIcon,
           fillColor,

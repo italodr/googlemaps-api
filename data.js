@@ -2,6 +2,8 @@ export default [
   {
     id: 1,
     title: 'Galerie Roche',
+    description:
+      'Die Galerie Roche umfasst das gesamte Spektrum der Klassische Modernen Kunst von Kubismus, Expressionismus, Surrealismus und Informel bis zur zeitgenössischen Figurativen Malerei',
     lat: 53.077828,
     lng: 8.818983,
     country: 'de',
