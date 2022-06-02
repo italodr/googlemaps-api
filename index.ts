@@ -6,31 +6,31 @@
 import data from './data';
 
 /*
-function initMap(): void {
-  const myLatLng = { lat: -25.363, lng: 131.044 };
-
-  const map = new google.maps.Map(
-    document.getElementById("map") as HTMLElement,
-    {
-      zoom: 4,
-      center: myLatLng,
-    }
-  );
-
-  new google.maps.Marker({
-    position: myLatLng,
-    map,
-    title: "Hello World!",
-  });
-}
-
-declare global {
-  interface Window {
-    initMap: () => void;
-  }
-}
-window.initMap = initMap;
-*/
+ function initMap(): void {
+   const myLatLng = { lat: -25.363, lng: 131.044 };
+ 
+   const map = new google.maps.Map(
+     document.getElementById("map") as HTMLElement,
+     {
+       zoom: 4,
+       center: myLatLng,
+     }
+   );
+ 
+   new google.maps.Marker({
+     position: myLatLng,
+     map,
+     title: "Hello World!",
+   });
+ }
+ 
+ declare global {
+   interface Window {
+     initMap: () => void;
+   }
+ }
+ window.initMap = initMap;
+ */
 
 class MapFactory {
   private options;
@@ -77,7 +77,7 @@ class MapFactory {
       fields: ['address_components', 'geometry', 'name'],
       ...options,
     });
-  } 
+  }
 }
 
 class SalesMap extends MapFactory {
@@ -97,8 +97,66 @@ class SalesMap extends MapFactory {
     anchor: new google.maps.Point(12, 30),
   };
 
+  private standorts = [
+    {
+      id: 4,
+      title: 'DE - Verkaufsbüro Stuttgart (04)',
+      plzBereiche: [
+        [70000, 71999],
+        [72600, 72699],
+        [73000, 74699],
+        [75000, 75038],
+        [75305, 75999],
+        [75046, 75050],
+        [75054, 75196],
+        [75201, 75249],
+      ],
+    },
+    {
+      id: 5,
+      title: 'DE - Verkaufsbüro Saar / Pfalz / Rhein-Neckar (05)',
+      plzBereiche: [
+        [69460, 69469],
+        [68650, 69239],
+        [69484, 69493],
+        [54000, 54999],
+        [55600, 55999],
+        [56800, 56999],
+        [66000, 66999],
+        [67000, 67199],
+        [67320, 67499],
+        [67600, 67799],
+        [67830, 67999],
+        [68000, 68599],
+        [69503, 69509],
+        [69515, 69999],
+        [69243, 69411],
+        [76708, 76764],
+        [76650, 76669],
+        [76705, 76706],
+        [76769, 76774],
+        [76780, 76999],
+      ],
+    },
+  ];
+
   constructor() {
     super();
+  }
+
+  private getStandortByZipcode(zipcode) {
+    const searchZipcode = parseInt(zipcode, 10);
+    let result;
+
+    this.standorts.map((standort) => {
+      standort.plzBereiche.map((plzBereich) => {
+        if (searchZipcode >= plzBereich[0] && searchZipcode <= plzBereich[1]) {
+          result = standort;
+        }
+      });
+    });
+
+    return result;
   }
 
   public createMarkers(markers = []) {
@@ -130,14 +188,24 @@ class SalesMap extends MapFactory {
   public filterMarkersByZipcode(zipcode, markers = []) {
     if (!zipcode) return markers;
 
-    return markers.filter((m) => m.zipcode === zipcode);
+    const standort = this.getStandortByZipcode(zipcode);
+    return markers.reduce((prev, curr) => {
+      const searchZipcode = parseInt(curr.zipcode, 10);
+
+      standort.plzBereiche.map((plzBereich) => {
+        if (searchZipcode >= plzBereich[0] && searchZipcode <= plzBereich[1]) {
+          prev.push(curr);
+        }
+      });
+
+      return prev;
+    }, []);
   }
 
-  public updateMarkers() {
+  public updateMarkers(markers = []) {
     super.clearMarkers();
     // Centrar según markers
-    const foo = this.filterMarkersByType('partner', data);
-    this.createMarkers(foo);
+    this.createMarkers(markers);
   }
 
   public changeCountry(country) {
@@ -157,7 +225,7 @@ function initMap(): void {
   const mapContainer = document.getElementById('map');
   const searchInput = document.querySelector('[name="autocomplete"]');
   const salesMap = new SalesMap();
-  
+
   salesMap.create(mapContainer);
   salesMap.centerByCountryName('Germany');
   const filteredData = salesMap.filterMarkersByCountry('de', data);
@@ -171,20 +239,21 @@ function initMap(): void {
   });
 
   autocompleteInput.addListener('place_changed', async () => {
-    const place = autocompleteInput.getPlace();
-    console.log(place);
+    const { name } = autocompleteInput.getPlace();
+    const filteredData = salesMap.filterMarkersByZipcode(name, data);
+    console.log(filteredData);
+    salesMap.updateMarkers(filteredData);
   });
 
-
   /**
-   * Multiple maps
-   * 
-  const mapContainer2 = document.getElementById('map2');
-  const salesMap2 = new SalesMap();
-
-  salesMap2.create(mapContainer2);
-  salesMap2.centerByCountryName('Peru');
-  */
+    * Multiple maps
+    * 
+   const mapContainer2 = document.getElementById('map2');
+   const salesMap2 = new SalesMap();
+ 
+   salesMap2.create(mapContainer2);
+   salesMap2.centerByCountryName('Peru');
+   */
 
   document.querySelector('#clearButton')?.addEventListener('click', () => {
     salesMap.updateMarkers();
