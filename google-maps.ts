@@ -22,7 +22,7 @@ export default class MapFactory {
     });
   }
 
-  protected centerByBounds() {
+  public centerByBounds() {
     this.map.fitBounds(this.bounds);
   }
 
@@ -30,13 +30,17 @@ export default class MapFactory {
     const marker = new google.maps.Marker({
       map: this.map,
       position: { lat, lng },
-      ...options
+      ...options,
     });
 
     this.allMarkers.push(marker);
     this.bounds.extend(marker.position);
 
     return marker;
+  }
+
+  public getCustomMarkerAnchor(x, y) {
+    return new google.maps.Point(x, y);
   }
 
   protected addListenerToMarker(marker, callback) {
@@ -49,13 +53,13 @@ export default class MapFactory {
   }
 
   protected clearMarkers() {
-    this.allMarkers.map(marker => marker.setMap(null));
+    this.allMarkers.map((marker) => marker.setMap(null));
   }
 
   public setAutocompleteInput(element, options = {}) {
     return new google.maps.places.Autocomplete(element, {
       fields: ['address_components', 'geometry', 'name'],
-      ...options
+      ...options,
     });
   }
 }
